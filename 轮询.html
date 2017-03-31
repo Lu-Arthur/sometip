@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>轮询</title>
+</head>
+<body>
+
+
+
+	<input type="text" id="text"/>  
+	<p id="ptext"></p>  
+
+
+
+	<script>
+		
+	function init(){
+ 		document.getElementById("ptext").innerHTML =document.getElementById("text").value; 
+	}
+
+	document.body.onload=function(){
+		init();
+		setInterval("init()",500);
+	}
+	</script>
+</body>
+</html>
