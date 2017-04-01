@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style>
+		p{
+			color:red;
+		}
+	</style>
+	
+</head>
+<body onload="showvalf()">
+	
+	<p id="page">this is hash html.</p>
+	
+
+	<script>
+			  // var thisURL = document.URL;
+			  var thisURL=location.search;
+			  	console.log(thisURL);    
+			  var  getval =thisURL.split('?')[1];
+			    // ["file.....hash.html","init=text"]
+
+			   // console.log(getval)
+			  var showval= getval.split("=")[1];
+			  // ["int","Text"]  
+			  function  showvalf(){  
+			     document.getElementById('page').innerHTML=showval;     
+			  }  	
+	</script>
+</body>
+</html>

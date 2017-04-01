@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+
+</head>
+<body>
+	
+	<input type="text" id="init" value="Text">
+	<button type="button" id="btn" onclick="test()">跳转</button>
+	<script>
+		function test(){
+	        var  getval =document.getElementById("init").value;  
+        	location.href="hash.html?a="+getval;           
+    }
+	</script>
+</body>
+</html>
