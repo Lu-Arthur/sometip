@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+	</head>
+	<body>
+		<div id="app">
+			{{ username }}
+			<input type="text" mb-model="username"/>
+		</div>
+	</body>
+<script type="text/javascript">
+	(function(){
+		function Clone(obj){
+		var 
+			temp;
+			if(Object.prototype.toString.call(obj) === '[object Array]'){
+				temp = [];
+				var i = obj.length;
+				while(i--){
+					temp[i] = Clone(obj[i]);
+				}
+				return temp;
+			}
+			if(Object.prototype.toString.call(obj) === '[object Object]' && !obj.length){
+				temp = {};
+				for(var i in obj){
+					temp[i] = Clone(obj[i]);
+				}
+				return temp;
+			}
+			return obj;
+		}
+		function extend(obj,extendsion){
+			for(var key in obj){ 
+				extendsion[key] = Clone(obj[key]);
+			}
+		}
+		function ObserverList(){
+			this.observerList = [];
+		}
+		ObserverList.prototype.add = function(obj){
+			return this.observerList.push(obj);
+		};
+		ObserverList.prototype.empty = function(){
+			this.observerList = [];
+		};
+		ObserverList.prototype.count = function(){
+			return this.observerList.length;
+		};
+		ObserverList.prototype.get = function(index){
+			if(index>-1 && index < this.observerList.length){
+				return this.observerList[index];
+			}
+			throw new RangeError();
+		};
+		ObserverList.prototype.insert = function(obj,index){
+			this.observerList.splice(index,0,obj);
+		};
+		ObserverList.prototype.removeIndexAt = function(index){
+			this.observerList.splice(index,1);
+		};
+		ObserverList.prototype.indexOf = function(obj,startIndex){
+		var
+			i = startIndex,pointer = -1;
+			while (i<this.observerList.length){
+				if(this.observerList[i]===obj){
+					pointer = i;
+				}
+				i++;
+			}
+			return pointer;
+		};
+		 
+		function Subject(){
+			this.observers = new ObserverList();
+		}
+		Subject.prototype.addObserver = function(observer){
+			this.observers.add(observer);
+		};
+		Subject.prototype.removeObserver = function(observer){
+			this.observers.removeIndexAt(this.observers.indexOf(observer,0));
+		};
+		Subject.prototype.notify = function(context){
+		var 
+			observer_count = this.observers.count();
+			for(var i = 0;i < observer_count;i++){
+				this.observers.get(i).update(context);
+			}
+		};
+		function Observer(param){
+			this.update = param.update||function(){
+				throw new Error('update method unimplement');
+			};
+		}
+		function VMSubject(){
+			this.observers = new ObserverList();
+		}
+		extend(new Subject(),VMSubject.prototype);
+		function VMObserver(mb,node,name){
+			VMSubject.target = this;
+			this.mb = mb;
+			this.node = node;
+			this.name = name;
+			this.update();
+			VMSubject.target = null;
+		}
+		VMObserver.prototype.getVMValue = function(){
+			return this.mb[this.name];
+		};
+		extend(new Observer({
+			update:function(val){
+			var
+				value = val || this.getVMValue();
+				if(this.node.nodeType==1){
+					this.node.value = value;
+				}
+				if(this.node.nodeType==3){
+					this.node.nodeValue = value;
+				}
+			}
+		}),VMObserver.prototype);
+		
+		
+		function NodeToFragment(node,mb){
+		var
+			df = document.createDocumentFragment(),
+			child;
+			while(child = node.firstChild){
+				Compile(child,mb);
+				df.appendChild(child);
+			}
+			return df;
+		}
+		
+		function Compile(node,mb){ 
+		var
+			reg = /\{\{(.*)\}\}/,
+			type = {
+				ELEMENT:1,
+				TEXT:3
+			};
+			if(node.nodeType == type.ELEMENT){
+			var 
+				attr = node.attributes;
+				for(var i = 0;i < attr.length;i++){
+					if(attr[i].nodeName == 'mb-model'){
+					var 
+						name = attr[i].nodeValue;
+						node.addEventListener('input', function (e) {
+			              mb[name] = e.target.value;
+			            });
+						new VMObserver(mb,node,name);
+						node.removeAttribute('mb-model');
+					}
+				}
+			}
+			if(node.nodeType == type.TEXT){
+				if(reg.test(node.nodeValue)){
+				var
+					name = RegExp.$1;
+					name = name.trim();
+					new VMObserver(mb,node,name);
+				}
+			}
+		}
+		function DefineVMHook(obj,key,val){
+		var
+			sub = new VMSubject();
+			Object.defineProperty(obj,key,{
+				set:function(newVal){
+					if(newVal==val){
+						return void 0;
+					}
+					val = newVal;
+					sub.notify(val);
+				},
+				get:function(){
+					if(VMSubject.target){
+						sub.addObserver(VMSubject.target);
+					}
+					return val;
+				}
+			});
+		}
+		function BindVM(obj,mb){
+			Object.keys(obj).forEach(function(key){
+				DefineVMHook(mb,key,obj[key]);
+			});
+		}
+		function MB(options){
+			this.data = options.data;
+			BindVM(this.data,this);
+		var
+			id = options.el;
+			dom = NodeToFragment(document.getElementById(id),this);
+			document.getElementById(id).appendChild(dom);
+		}
+		a = new MB({
+			el:'app',
+			data:{
+				text:'615515',
+				username:'155'
+			}
+		})
+	})();
+</script>
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style type="text/css">
+		.rectangle{
+			width: 200px;
+			height: 40px;
+			border: 1px solid black;
+			position: absolute;
+		}
+	</style>
+</head>
+<body>
+	<!-- <div class="rectangle"></div> -->
+
+	<script type="text/javascript">
+		var data = [
+			{name:'SaaS',x:124,y:654},
+			{name:'gad',x:124,y:654},
+			{name:'Safg',x:124,y:654},
+			{name:'我去',x:615,y:156},
+			{name:'爱的飒飒的',x:32,y:312},
+			{name:'发送',x:324,y:564},
+			{name:'共和国',x:32,y:23},
+			{name:'投影仪',x:23,y:324},
+			{name:'鱼鱼',x:342,y:23},
+			{name:'人体',x:234,y:67},
+			{name:'而我',x:677,y:678},
+			{name:'扔他',x:67,y:45},
+			{name:'扔他1',x:67,y:45},
+			{name:'扔他2',x:67,y:45},
+			{name:'而我1',x:677,y:678},
+			{name:'而我2',x:677,y:678},
+		];
+
+		var RectFactory = (function(){
+			var inside_shareobj = {};
+
+			function React(){
+				this.createRec();
+			}
+			React.prototype.createRec=function(){
+				var div = document.createElement('div');
+				var tn  = document.createTextNode(inside_shareobj.name);
+				div.className = "rectangle";
+				div.style.top = inside_shareobj.y+'px';
+				div.style.left = inside_shareobj.x+'px';
+				div.appendChild(tn);
+				document.body.appendChild(div);
+			};
+
+			return {
+				create:function(obj){
+					inside_shareobj = obj;
+					return new React();
+				}
+			}
+		})();
+		function Clone(obj){
+			var temp;
+			if(Object.prototype.toString.call(obj) == '[object Array]'){
+				temp = [];
+				for(var i in obj){
+					temp[i] = Clone(obj[i]);
+				}
+				return temp;
+			}
+			if(Object.prototype.toString.call(obj) == '[object Object]'){
+				temp = {};
+				for(var i in obj){
+					temp[i] = Clone(obj[i]);
+				}
+				return temp;
+			}
+			return obj;
+		}
+		function parseTempArr(data){
+
+			var tempArr=[];
+			var ret=[];
+			var tempdata = Clone(data);
+			for(var j=0;j<tempdata.length;j++){
+				for(var k=0;k<data.length;k++){
+					if((tempdata[j].x==data[k].x)&&(tempdata[j].y==data[k].y)){
+						tempArr.push(Clone(data[k]));
+						data[k] = {};
+					}
+				}
+				
+				
+				if(tempArr.length>1){
+					ret=ret.concat(offsetHandler(tempArr));
+					 	
+				}else{
+					
+					ret=ret.concat(tempArr);
+				}
+
+				tempArr=[];
+			}
+			
+			return ret;
+		}
+		
+		function offsetHandler(arr){
+			var i = 1;
+			for(;i<arr.length;i++){
+				arr[i].x+=(i*10);
+				arr[i].y+=(i*10);
+				console.log(arr[i])
+			}
+
+			return arr;
+		}
+		var arr=parseTempArr(data);
+		console.log(arr)
+		for(var i=0;i<arr.length;i++){
+
+			RectFactory.create(arr[i]);
+		}
+
+
+	</script>
+</body>
+</html>
