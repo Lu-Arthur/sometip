@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	
+	A
+	<span id="ex">
+		ddddddd
+	</span>
+	<button>click</button>
+	<script>
+
+		function target() {
+			this.dom = document.querySelector('button');
+			this.init = function () {
+				this.addEvent();
+			};
+			this.addEvent = function () {
+				this.dom.onclick = function () {
+					window.open('b.html', '_blank');
+				}
+			}
+			
+		}
+		
+		function ex() {
+			document.getElementById('ex').innerText = "修改了";
+		}
+
+		new target().init();
+		
+	</script>
+</body>
+</html>
